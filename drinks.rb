@@ -112,6 +112,5 @@ while (true)
 end
 =begin
 TODO
-autocomplete
 evernote API
 =end
