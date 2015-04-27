@@ -1,5 +1,11 @@
 require_relative 'evernote_config.rb'
 
+class String
+  def titleize
+    self.split.map(&:capitalize).join(' ')
+  end
+end
+
 class Pantry
   attr_accessor :data, :source
 
@@ -35,6 +41,10 @@ class Recipes
 
   def all_ingredients
     @data.values.flatten.uniq
+  end
+
+  def titles
+    @data.keys.map(&:titleize)
   end
 
   def add(name, ingredients)

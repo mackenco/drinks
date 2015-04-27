@@ -3,16 +3,12 @@ require 'colorize'
 require 'readline'
 require_relative 'evernote'
 
-class String
-  def titleize
-    self.split.map(&:capitalize).join(' ')
-  end
-end
-
-evernote_drinks = EvernoteData.new.drinks
+# evernote_drinks = EvernoteData.new.drinks
 pantry = Pantry.new("pantry.json")
 recipes = Recipes.new("recipes.json") 
 all_ingreds = recipes.all_ingredients 
+
+p recipes.titles
 
 while (true)
   puts "[m]ake | [p]antry | [r]ecipe | [e]xit"
