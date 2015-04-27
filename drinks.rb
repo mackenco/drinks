@@ -1,6 +1,7 @@
 require 'json'
 require 'colorize'
 require 'readline'
+require_relative 'evernote'
 
 class String
   def titleize
@@ -8,12 +9,14 @@ class String
   end
 end
 
+evernote_drinks = EvernoteData.new.drinks
+pantry = Pantry.new("pantry.json")
+recipes = Recipes.new("recipes.json") 
+all_ingreds = recipes.all_ingredients 
+
 while (true)
   puts "[m]ake | [p]antry | [r]ecipe | [e]xit"
   action = gets.chomp.downcase
-  pantry = JSON.parse(File.read("pantry.json")).sort
-  recipes = JSON.parse(File.read("recipes.json"))
-  all_ingreds = recipes.values.flatten.uniq
 
   case action[0]
 
@@ -58,11 +61,9 @@ while (true)
     case pantry_action
 
     when "a"
-      pantry << ingredient
-      File.write("pantry.json", pantry.uniq.sort.to_json, { mode: "w+" } )
+      pantry = pantry.add(ingredient)
     when "r"
-      pantry.delete(ingredient)
-      File.write("pantry.json", pantry.to_json, { mode: "w+" } )
+      pantry = pantry.remove(ingredient);
     end
 
     puts ""
@@ -97,8 +98,7 @@ while (true)
         end
       end
 
-      recipes[name] = ingreds
-      File.write("recipes.json", recipes.to_json, { mode: "w+" } )
+      recipes = recipes.add(name, ingreds)
       puts ""
       p "#{name} - #{ingreds.join(", ")}" 
     end
@@ -113,4 +113,7 @@ end
 =begin
 TODO
 evernote API
+unmade drinks
+missing ingreds for unmade
+launchy
 =end
