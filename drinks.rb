@@ -3,26 +3,39 @@ require 'colorize'
 require 'readline'
 require_relative 'evernote'
 
-# evernote_drinks = EvernoteData.new.drinks
+# evernote_drinks = EvernoteData.new
 pantry = Pantry.new("pantry.json")
 recipes = Recipes.new("recipes.json") 
 all_ingreds = recipes.all_ingredients 
 
-p recipes.titles
-
 while (true)
-  puts "[m]ake | [p]antry | [r]ecipe | [e]xit"
+
+  # unsynced = evernote_drinks.titles - recipes.titles
+  # if (unsynced.length > 0)
+  #   puts "You have not synced \(press number to sync\):".colorize(:red)
+  #   unsynced.each_with_index do |name, i| 
+  #     print "#{i + 1}.".ljust(3).colorize(:light_yellow)
+  #     print "#{name.titleize}".colorize(:light_yellow)
+  #     puts ""
+  #   end
+  # end
+
+  puts ""
+  puts "[m]ake | [p]antry | [r]ecipe | [q]uit"
   action = gets.chomp.downcase
 
-  case action[0]
-
-  when "m"
+  if action[0].to_i > 0
+    if unsynced[action[0].to_i - 1]
+      #add drink needs to be a function, used here (with name given) and later on
+      puts "hi"
+    end
+  elsif action[0] == "m"
     one_off = []
     puts ""
     puts "You can make:"
 
     recipes.sort.each do |name, ingreds|
-      diff = ingreds - pantry
+      diff = ingreds - pantry.data
       
       if (diff).empty?
         print "#{name.titleize}".ljust(20).colorize(:red)
@@ -48,7 +61,7 @@ while (true)
     end
     puts ""
 
-  when "p"
+  elsif action[0] == "p"
     puts "[a]dd [ingredient] | [r]emove [ingredient] | [s]how"
     input = gets.chomp.split(" ")
     pantry_action = input[0]
@@ -65,7 +78,7 @@ while (true)
     puts ""
     puts pantry.sort
 
-  when "r"
+  elsif action[0] == "r"
     puts "[a]dd [name] | [r]emove [name] | [s]how"
     input = gets.chomp.split(" ")
     recipe_action = input[0]
@@ -99,7 +112,7 @@ while (true)
       p "#{name} - #{ingreds.join(", ")}" 
     end
 
-  when "e"
+  elsif action[0] == "q"
     break
 
   else 
@@ -108,8 +121,9 @@ while (true)
 end
 =begin
 TODO
-evernote API
+unsynced drinks
 unmade drinks
 missing ingreds for unmade
+highlight make based on like or not
 launchy
 =end

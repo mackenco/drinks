@@ -43,6 +43,10 @@ class Recipes
     @data.values.flatten.uniq
   end
 
+  def sort
+    @data.sort
+  end
+
   def titles
     @data.keys.map(&:titleize)
   end
@@ -56,7 +60,7 @@ end
 
 class EvernoteData
 
-  attr_accessor :drinks 
+  attr_accessor :data
 
   def initialize
 
@@ -65,7 +69,7 @@ class EvernoteData
     filter = Evernote::EDAM::NoteStore::NoteFilter.new
     filter.notebookGuid = "9ad5c9c9-8018-451d-95ed-0c7223983c4e"
     drink_notes = note_store.findNotes(DEVELOPER_TOKEN, filter, nil, 1000)
-    @drinks = {}
+    @data = {}
     drink_notes.notes.map do |note|
       title = note.title.split("|")
       if title[1]
@@ -73,11 +77,15 @@ class EvernoteData
         favorite = title[1].include?("!")
       end
 
-      @drinks[title[0].strip] = {
+      @data[title[0].strip] = {
         url: note.attributes.sourceURL,
         made: made || false,
         favorite: favorite || false
       }
     end
+  end
+
+  def titles
+    @data.keys.map(&:titleize)
   end
 end
