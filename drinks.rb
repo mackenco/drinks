@@ -22,14 +22,14 @@ while (true)
 
   puts ""
   puts "[m]ake | [p]antry | [r]ecipe | [q]uit"
-  action = gets.chomp.downcase
+  action = gets.chomp.downcase[0]
 
-  if action[0].to_i > 0
-    if unsynced[action[0].to_i - 1]
+  if action.to_i > 0
+    if unsynced[action.to_i - 1]
       #add drink needs to be a function, used here (with name given) and later on
       puts "hi"
     end
-  elsif action[0] == "m"
+  elsif action == "m"
     one_off = []
     puts ""
     puts "You can make:"
@@ -61,7 +61,7 @@ while (true)
     end
     puts ""
 
-  elsif action[0] == "p"
+  elsif action == "p"
     puts "[a]dd [ingredient] | [r]emove [ingredient] | [s]how"
     input = gets.chomp.split(" ")
     pantry_action = input[0]
@@ -78,7 +78,7 @@ while (true)
     puts ""
     puts pantry.sort
 
-  elsif action[0] == "r"
+  elsif action == "r"
     puts "[a]dd [name] | [r]emove [name] | [s]how"
     input = gets.chomp.split(" ")
     recipe_action = input[0]
@@ -112,7 +112,7 @@ while (true)
       p "#{name} - #{ingreds.join(", ")}" 
     end
 
-  elsif action[0] == "q"
+  elsif action == "q"
     break
 
   else 
