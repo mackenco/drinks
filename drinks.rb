@@ -85,20 +85,21 @@ while (true)
     end
 
     one_off.each do |r|
-      print "#{i}. #{r[0]}".ljust(20).colorize(:red)
+      print "#{idx}. #{r[0]}".ljust(20).colorize(:red)
       print "#{r[1]}".colorize(:light_yellow)
       puts ""
 
       order << r[0]
-      i += 1
+      idx += 1
     end
     puts ""
-    puts "Enter number for recipe".colorize(:light_cyan)
-    puts ""
+    puts "Enter number for recipe:".colorize(:light_cyan)
     
     index = gets.chomp.to_i
-    title = order[index - 1]
-    Launchy.open(@evernote_drinks[title][:url])
+    if (index > 0)
+      title = order[index - 1]
+      Launchy.open(@evernote_drinks[title][:url])
+    end
 
   elsif action == "p"
     puts "[a]dd [ingredient] | [r]emove [ingredient] | [s]how"
@@ -141,6 +142,15 @@ while (true)
         print "#{t}".colorize(:light_yellow)
         puts ""
       end
+
+      puts ""
+      puts "Enter number for recipe:".colorize(:light_cyan)
+
+      index = gets.chomp.to_i
+      if (index > 0)
+        title = @recipes.titles.sort[index - 1]
+        Launchy.open(@evernote_drinks[title][:url]) 
+      end
     end
 
   elsif action == "q"
@@ -155,5 +165,4 @@ TODO
 unmade drinks
 missing ingreds for unmade
 highlight make based on like or not
-launchy
 =end
