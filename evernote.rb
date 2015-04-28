@@ -52,7 +52,13 @@ class Recipes
   end
 
   def add(name, ingredients)
-    @data[name] = ingredeints
+    @data[name] = ingredients 
+    File.write(@source, @data.to_json, { mode: "w+" } )
+    self
+  end
+
+  def remove(name)
+    @data.delete(name.downcase)
     File.write(@source, @data.to_json, { mode: "w+" } )
     self
   end

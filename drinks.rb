@@ -3,14 +3,40 @@ require 'colorize'
 require 'readline'
 require_relative 'evernote'
 
+@pantry = Pantry.new("pantry.json")
+@recipes = Recipes.new("recipes.json") 
+@all_ingreds = @recipes.all_ingredients 
 # evernote_drinks = EvernoteData.new
-pantry = Pantry.new("pantry.json")
-recipes = Recipes.new("recipes.json") 
-all_ingreds = recipes.all_ingredients 
+
+def add_drink(name)
+  ingreds = []
+
+  comp = proc { |s| @all_ingreds.grep( /^#{Regexp.escape(s)}/) }
+  Readline.completion_proc = comp
+  Readline.completion_append_character = ""
+
+  while (true)
+    puts "[ingredient] | quit"
+    input = Readline.readline('', true)
+    break if input == "quit"
+
+    if (@all_ingreds.include?(input))
+      ingreds << input
+    else
+      puts "are you sure you want to add a new ingredient? [y] | [n]"
+      action = gets.chomp
+      ingreds << input if action == "y"
+    end
+  end
+
+  @recipes = @recipes.add(name, ingreds)
+  puts ""
+  p "#{name} - #{ingreds.join(", ")}"
+end
 
 while (true)
 
-  # unsynced = evernote_drinks.titles - recipes.titles
+  # unsynced = evernote_drinks.titles - @recipes.titles
   # if (unsynced.length > 0)
   #   puts "You have not synced \(press number to sync\):".colorize(:red)
   #   unsynced.each_with_index do |name, i| 
@@ -34,8 +60,8 @@ while (true)
     puts ""
     puts "You can make:"
 
-    recipes.sort.each do |name, ingreds|
-      diff = ingreds - pantry.data
+    @recipes.sort.each do |name, ingreds|
+      diff = ingreds - @pantry.data
       
       if (diff).empty?
         print "#{name.titleize}".ljust(20).colorize(:red)
@@ -70,16 +96,16 @@ while (true)
     case pantry_action
 
     when "a"
-      pantry = pantry.add(ingredient)
+      @pantry = @pantry.add(ingredient)
     when "r"
-      pantry = pantry.remove(ingredient);
+      @pantry = @pantry.remove(ingredient);
     end
 
     puts ""
-    puts pantry.sort
+    puts @pantry.sort
 
   elsif action == "r"
-    puts "[a]dd [name] | [r]emove [name] | [s]how"
+    puts "[a]dd [name] | [r]emove | [s]how"
     input = gets.chomp.split(" ")
     recipe_action = input[0]
     name = input[1..-1].join(" ")
@@ -87,29 +113,15 @@ while (true)
     case recipe_action
 
     when "a"
-      ingreds = []
-
-      comp = proc { |s| all_ingreds.grep( /^#{Regexp.escape(s)}/) }
+      add_drink(name)
+    when "r"
+      comp = proc { |s| @recipes.titles.grep( /^#{Regexp.escape(s)}/) }
       Readline.completion_proc = comp
       Readline.completion_append_character = ""
 
-      while (true)
-        puts "[ingredient] | exit"
-        input = Readline.readline('', true)
-        break if input == "exit"
-
-        if (all_ingreds.include?(input))
-          ingreds << input
-        else
-          puts "are you sure you want to add a new ingredient? [y] | [n]"
-          action = gets.chomp
-          ingreds << input if action == "y"
-        end
-      end
-
-      recipes = recipes.add(name, ingreds)
-      puts ""
-      p "#{name} - #{ingreds.join(", ")}" 
+      puts @recipes.titles
+      input = Readline.readline('', true)
+      @recipes = @recipes.remove(input)
     end
 
   elsif action == "q"
