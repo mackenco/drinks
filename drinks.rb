@@ -6,7 +6,7 @@ require_relative 'evernote'
 @pantry = Pantry.new("pantry.json")
 @recipes = Recipes.new("recipes.json") 
 @all_ingreds = @recipes.all_ingredients 
-# evernote_drinks = EvernoteData.new
+@evernote_drinks = EvernoteData.new
 
 def add_drink(name)
   ingreds = []
@@ -36,25 +36,23 @@ end
 
 while (true)
 
-  # unsynced = evernote_drinks.titles - @recipes.titles
-  # if (unsynced.length > 0)
-  #   puts "You have not synced \(press number to sync\):".colorize(:red)
-  #   unsynced.each_with_index do |name, i| 
-  #     print "#{i + 1}.".ljust(3).colorize(:light_yellow)
-  #     print "#{name.titleize}".colorize(:light_yellow)
-  #     puts ""
-  #   end
-  # end
+  unsynced = @evernote_drinks.titles - @recipes.titles
+  if (unsynced.length > 0)
+    puts "You have not synced \(press number to sync\):".colorize(:red)
+    unsynced.each_with_index do |name, i| 
+      print "#{i + 1}.".ljust(3).colorize(:light_yellow)
+      print "#{name.titleize}".colorize(:light_yellow)
+      puts ""
+    end
+  end
 
   puts ""
   puts "[m]ake | [p]antry | [r]ecipe | [q]uit"
   action = gets.chomp.downcase[0]
 
   if action.to_i > 0
-    if unsynced[action.to_i - 1]
-      #add drink needs to be a function, used here (with name given) and later on
-      puts "hi"
-    end
+    drink = unsynced[action.to_i - 1]
+    add_drink(drink) if drink
   elsif action == "m"
     one_off = []
     puts ""
