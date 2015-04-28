@@ -49,12 +49,14 @@ while (true)
 
   puts ""
   puts "[m]ake | [p]antry | [r]ecipe | [q]uit"
-  action = gets.chomp.downcase[0]
+  selection = gets.chomp.split(" ")
+  action = selection[0].downcase[0]
 
   if action.to_i > 0
     drink = unsynced[action.to_i - 1]
     add_drink(drink) if drink
   elsif action == "m"
+    ingredient = selection[1]
     one_off, order = [], []
     idx = 1
 
@@ -62,6 +64,8 @@ while (true)
     puts "You can make:"
 
     @recipes.sort.each do |name, ingreds|
+      next if ingredient && !ingreds.include?(ingredient.downcase)
+
       diff = ingreds - @pantry.data
       
       if (diff).empty?
@@ -77,21 +81,25 @@ while (true)
     end
 
     puts ""
-    puts "You are one off from:"
 
-    one_off.sort! do |a, b|
-      comp = (a[1] <=> b[1])
-      comp.zero? ? (a[0] <=> b[0]) : comp
+    if (one_off.length > 0)
+      puts "You are one off from:"
+
+      one_off.sort! do |a, b|
+        comp = (a[1] <=> b[1])
+        comp.zero? ? (a[0] <=> b[0]) : comp
+      end
+
+      one_off.each do |r|
+        print "#{idx}. #{r[0]}".ljust(25).colorize(:red)
+        print "#{r[1]}".colorize(:light_yellow)
+        puts ""
+
+        order << r[0]
+        idx += 1
+      end
     end
 
-    one_off.each do |r|
-      print "#{idx}. #{r[0]}".ljust(25).colorize(:red)
-      print "#{r[1]}".colorize(:light_yellow)
-      puts ""
-
-      order << r[0]
-      idx += 1
-    end
     puts ""
     puts "Enter number for recipe:".colorize(:light_cyan)
     
