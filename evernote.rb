@@ -91,6 +91,10 @@ class EvernoteData
     end
   end
 
+  def [](key)
+    @data[key]
+  end
+
   def titles
     @data.keys.map(&:titleize)
   end

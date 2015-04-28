@@ -1,6 +1,7 @@
 require 'json'
 require 'colorize'
 require 'readline'
+require 'launchy'
 require_relative 'evernote'
 
 @pantry = Pantry.new("pantry.json")
@@ -57,14 +58,19 @@ while (true)
     one_off = []
     puts ""
     puts "You can make:"
+    idx = 1
+    order = []
 
     @recipes.sort.each do |name, ingreds|
       diff = ingreds - @pantry.data
       
       if (diff).empty?
-        print "#{name.titleize}".ljust(20).colorize(:red)
+        print "#{idx}. #{name.titleize}".ljust(20).colorize(:red)
         print "#{ingreds.join(", ").titleize}".colorize(:light_blue)
         puts ""
+
+        order << name
+        idx += 1
       end
 
       one_off << [name.titleize, diff[0].titleize] if (diff.length == 1)
@@ -79,11 +85,20 @@ while (true)
     end
 
     one_off.each do |r|
-      print "#{r[0]}".ljust(20).colorize(:red)
+      print "#{i}. #{r[0]}".ljust(20).colorize(:red)
       print "#{r[1]}".colorize(:light_yellow)
       puts ""
+
+      order << r[0]
+      i += 1
     end
     puts ""
+    puts "Enter number for recipe".colorize(:light_cyan)
+    puts ""
+    
+    index = gets.chomp.to_i
+    title = order[index - 1]
+    Launchy.open(@evernote_drinks[title][:url])
 
   elsif action == "p"
     puts "[a]dd [ingredient] | [r]emove [ingredient] | [s]how"
@@ -120,6 +135,12 @@ while (true)
       puts @recipes.titles
       input = Readline.readline('', true)
       @recipes = @recipes.remove(input)
+    when "s"
+      @recipes.titles.sort.each_with_index do |t, i|
+        print "#{i + 1}.".ljust(5).colorize(:light_yellow)
+        print "#{t}".colorize(:light_yellow)
+        puts ""
+      end
     end
 
   elsif action == "q"
@@ -131,7 +152,6 @@ while (true)
 end
 =begin
 TODO
-unsynced drinks
 unmade drinks
 missing ingreds for unmade
 highlight make based on like or not
