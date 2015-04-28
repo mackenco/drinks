@@ -2,7 +2,7 @@ require 'json'
 require 'colorize'
 require 'readline'
 require 'launchy'
-require_relative 'evernote'
+require_relative 'data_classes'
 
 @pantry = Pantry.new("pantry.json")
 @recipes = Recipes.new("recipes.json") 
@@ -55,17 +55,17 @@ while (true)
     drink = unsynced[action.to_i - 1]
     add_drink(drink) if drink
   elsif action == "m"
-    one_off = []
+    one_off, order = [], []
+    idx = 1
+
     puts ""
     puts "You can make:"
-    idx = 1
-    order = []
 
     @recipes.sort.each do |name, ingreds|
       diff = ingreds - @pantry.data
       
       if (diff).empty?
-        print "#{idx}. #{name.titleize}".ljust(20).colorize(:red)
+        print "#{idx}. #{name.titleize}".ljust(25).colorize(:red)
         print "#{ingreds.join(", ").titleize}".colorize(:light_blue)
         puts ""
 
@@ -85,7 +85,7 @@ while (true)
     end
 
     one_off.each do |r|
-      print "#{idx}. #{r[0]}".ljust(20).colorize(:red)
+      print "#{idx}. #{r[0]}".ljust(25).colorize(:red)
       print "#{r[1]}".colorize(:light_yellow)
       puts ""
 
@@ -163,6 +163,6 @@ end
 =begin
 TODO
 unmade drinks
-missing ingreds for unmade
+missing ingreds for unmade (& just drinks in general)
 highlight make based on like or not
 =end
