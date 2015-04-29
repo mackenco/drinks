@@ -41,7 +41,10 @@ def print_recipes(recipes)
     bkg = favorite ? :blue : :black
     color = favorite ? :light_white : :red
     print "#{i + 1}. #{name}".ljust(25).colorize(background: bkg, color: color)
-    print "#{ingreds.join(", ")}".prepend("  ").white
+    part = ingreds.partition { |ing| @pantry.data.include?(ing)}
+    print "#{part[1].map(&:upcase).join(", ")}".yellow
+    print " "
+    print "#{part[0].join(", ")}".white
     puts ""
   end
 end
@@ -153,5 +156,4 @@ end
 TODO
 unmade drinks
 missing ingreds for unmade (& just drinks in general)
-focus ingredient in one off
 =end
