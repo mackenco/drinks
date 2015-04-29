@@ -7,7 +7,7 @@ require_relative 'data_classes'
 @pantry = Pantry.new("pantry.json")
 @recipes = Recipes.new("recipes.json") 
 @all_ingreds = @recipes.all_ingredients 
-# @evernote_drinks = EvernoteData.new
+@evernote_drinks = EvernoteData.new
 
 def add_drink(name)
   ingreds = []
@@ -37,23 +37,26 @@ end
 
 def print_recipes(recipes)
   recipes.each_with_index do |(name, ingreds), i|
-    print "#{i + 1}. #{name}".ljust(25).red
-    print "#{ingreds.join(", ")}".light_blue
+    favorite = @evernote_drinks[name][:favorite]
+    bkg = favorite ? :blue : :black
+    color = favorite ? :light_white : :red
+    print "#{i + 1}. #{name}".ljust(25).colorize(background: bkg, color: color)
+    print "#{ingreds.join(", ")}".prepend("  ").white
     puts ""
   end
 end
 
 while (true)
 
-  # unsynced = @evernote_drinks.titles - @recipes.titles
-  # if (unsynced.length > 0)
-  #   puts "You have not synced \(press number to sync\):".red
-  #   unsynced.each_with_index do |name, i| 
-  #     print "#{i + 1}.".ljust(3).light_yellow
-  #     print "#{name}".light_yellow
-  #     puts ""
-  #   end
-  # end
+  unsynced = @evernote_drinks.titles - @recipes.titles
+  if (unsynced.length > 0)
+    puts "You have not synced \(press number to sync\):".red
+    unsynced.each_with_index do |name, i| 
+      print "#{i + 1}.".ljust(3).light_yellow
+      print "#{name}".light_yellow
+      puts ""
+    end
+  end
 
   puts ""
   puts "[m]ake | [p]antry | [r]ecipe | [q]uit"
@@ -68,7 +71,7 @@ while (true)
     ingredient = selection[1]
 
     puts ""
-    puts "You can make:"
+    puts "You can make (Enter number for recipe)"
 
     makeable = @recipes.missing_ingredients(@pantry, 0, ingredient)
     one_off = @recipes.missing_ingredients(@pantry, 1, ingredient)
@@ -80,13 +83,10 @@ while (true)
       puts "You are one off from:"
       print_recipes(one_off)
     end
-
-    puts ""
-    puts "Enter number for recipe:".light_cyan
     
     index = gets.chomp.to_i
     if (index > 0)
-      title = makeable[index - 1]
+      title = makeable[index - 1][0]
       Launchy.open(@evernote_drinks[title][:url])
     end
 
@@ -153,5 +153,5 @@ end
 TODO
 unmade drinks
 missing ingreds for unmade (& just drinks in general)
-highlight make based on like or not
+focus ingredient in one off
 =end
