@@ -52,7 +52,7 @@ class Recipes
   end
 
   def add(name, ingredients)
-    @data[name] = ingredients 
+    @data[name.titleize] = ingredients 
     File.write(@source, @data.to_json, { mode: "w+" } )
     self
   end
@@ -61,6 +61,15 @@ class Recipes
     @data.delete(name.downcase)
     File.write(@source, @data.to_json, { mode: "w+" } )
     self
+  end
+
+  def missing_ingredients(pantry, num_missing, filter = nil)
+    self.sort.select do |name, ingreds|
+      diff = ingreds - pantry.data
+
+      diff.length == num_missing || 
+      (filter && !ingreds.include?(filter.downcase))
+    end
   end
 end
 
@@ -83,7 +92,7 @@ class EvernoteData
         favorite = title[1].include?("!")
       end
 
-      @data[title[0].strip] = {
+      @data[title[0].strip.titleize] = {
         url: note.attributes.sourceURL,
         made: made || false,
         favorite: favorite || false

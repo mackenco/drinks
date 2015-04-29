@@ -7,7 +7,7 @@ require_relative 'data_classes'
 @pantry = Pantry.new("pantry.json")
 @recipes = Recipes.new("recipes.json") 
 @all_ingreds = @recipes.all_ingredients 
-@evernote_drinks = EvernoteData.new
+# @evernote_drinks = EvernoteData.new
 
 def add_drink(name)
   ingreds = []
@@ -35,17 +35,25 @@ def add_drink(name)
   p "#{name} - #{ingreds.join(", ")}"
 end
 
+def print_recipes(recipes)
+  recipes.each_with_index do |(name, ingreds), i|
+    print "#{i + 1}. #{name}".ljust(25).red
+    print "#{ingreds.join(", ")}".light_blue
+    puts ""
+  end
+end
+
 while (true)
 
-  unsynced = @evernote_drinks.titles - @recipes.titles
-  if (unsynced.length > 0)
-    puts "You have not synced \(press number to sync\):".colorize(:red)
-    unsynced.each_with_index do |name, i| 
-      print "#{i + 1}.".ljust(3).colorize(:light_yellow)
-      print "#{name.titleize}".colorize(:light_yellow)
-      puts ""
-    end
-  end
+  # unsynced = @evernote_drinks.titles - @recipes.titles
+  # if (unsynced.length > 0)
+  #   puts "You have not synced \(press number to sync\):".red
+  #   unsynced.each_with_index do |name, i| 
+  #     print "#{i + 1}.".ljust(3).light_yellow
+  #     print "#{name}".light_yellow
+  #     puts ""
+  #   end
+  # end
 
   puts ""
   puts "[m]ake | [p]antry | [r]ecipe | [q]uit"
@@ -55,57 +63,30 @@ while (true)
   if action.to_i > 0
     drink = unsynced[action.to_i - 1]
     add_drink(drink) if drink
+
   elsif action == "m"
     ingredient = selection[1]
-    one_off, order = [], []
-    idx = 1
 
     puts ""
     puts "You can make:"
 
-    @recipes.sort.each do |name, ingreds|
-      next if ingredient && !ingreds.include?(ingredient.downcase)
+    makeable = @recipes.missing_ingredients(@pantry, 0, ingredient)
+    one_off = @recipes.missing_ingredients(@pantry, 1, ingredient)
 
-      diff = ingreds - @pantry.data
-      
-      if (diff).empty?
-        print "#{idx}. #{name.titleize}".ljust(25).colorize(:red)
-        print "#{ingreds.join(", ").titleize}".colorize(:light_blue)
-        puts ""
-
-        order << name
-        idx += 1
-      end
-
-      one_off << [name.titleize, diff[0].titleize] if (diff.length == 1)
-    end
-
+    print_recipes(makeable)
     puts ""
 
     if (one_off.length > 0)
       puts "You are one off from:"
-
-      one_off.sort! do |a, b|
-        comp = (a[1] <=> b[1])
-        comp.zero? ? (a[0] <=> b[0]) : comp
-      end
-
-      one_off.each do |r|
-        print "#{idx}. #{r[0]}".ljust(25).colorize(:red)
-        print "#{r[1]}".colorize(:light_yellow)
-        puts ""
-
-        order << r[0]
-        idx += 1
-      end
+      print_recipes(one_off)
     end
 
     puts ""
-    puts "Enter number for recipe:".colorize(:light_cyan)
+    puts "Enter number for recipe:".light_cyan
     
     index = gets.chomp.to_i
     if (index > 0)
-      title = order[index - 1]
+      title = makeable[index - 1]
       Launchy.open(@evernote_drinks[title][:url])
     end
 
@@ -146,13 +127,13 @@ while (true)
       @recipes = @recipes.remove(input)
     when "s"
       @recipes.titles.sort.each_with_index do |t, i|
-        print "#{i + 1}.".ljust(5).colorize(:light_yellow)
-        print "#{t}".colorize(:light_yellow)
+        print "#{i + 1}.".ljust(5).light_yellow
+        print "#{t}".light_yellow
         puts ""
       end
 
       puts ""
-      puts "Enter number for recipe:".colorize(:light_cyan)
+      puts "Enter number for recipe:".light_cyan
 
       index = gets.chomp.to_i
       if (index > 0)
