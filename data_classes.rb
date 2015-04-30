@@ -67,8 +67,12 @@ class Recipes
     self.sort.select do |name, ingreds|
       diff = ingreds - pantry.data
 
-      diff.length == num_missing || 
-      (filter && !ingreds.include?(filter.downcase))
+      if filter
+        ingreds.include?(filter) && diff.length == num_missing
+      else
+        diff.length == num_missing
+      end
+
     end
   end
 end
