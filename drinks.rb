@@ -19,7 +19,7 @@ def add_drink(name)
   while (true)
     puts "[ingredient] | quit"
     input = Readline.readline('', true)
-    break if input == "quit"
+    break if input == "quit" || input == "q"
 
     if (@all_ingreds.include?(input))
       ingreds << input
@@ -37,12 +37,21 @@ end
 
 def print_recipes(recipes)
   recipes.each_with_index do |(name, ingreds), i|
+    made = @evernote_drinks[name][:made]
     favorite = @evernote_drinks[name][:favorite]
-    bkg = favorite ? :blue : :black
-    color = favorite ? :light_white : :red
+
+    if favorite
+      bkg, color = :blue, :light_white
+    elsif !made
+      bkg, color = :black, :red
+    else
+      bkg, color = :black, :light_blue
+    end
+
     print "#{i + 1}. #{name}".ljust(25).colorize(background: bkg, color: color)
+
     part = ingreds.partition { |ing| @pantry.data.include?(ing)}
-    print "#{part[1].map(&:upcase).join(", ")}".yellow
+    print " #{part[1].map(&:upcase).join(", ")}".yellow
     print " "
     print "#{part[0].join(", ")}".white
     puts ""
@@ -95,7 +104,7 @@ while (true)
     end
 
   elsif action == "p"
-    puts "[a]dd [ingredient] | [r]emove [ingredient] | [s]how"
+    puts "[a]dd [ingredient] | [r]emove [ingredient] | shopping [l]ist | [s]how"
     input = gets.chomp.split(" ")
     pantry_action = input[0]
     ingredient = input[1..-1].join(" ")
@@ -104,15 +113,18 @@ while (true)
 
     when "a"
       @pantry = @pantry.add(ingredient)
+      puts @pantry.sort
     when "r"
-      @pantry = @pantry.remove(ingredient);
+      @pantry = @pantry.remove(ingredient)
+      puts @pantry.sort
+    when "l"
+      puts (@all_ingreds - @pantry.data).sort
+    else 
+      puts @pantry.sort
     end
 
-    puts ""
-    puts @pantry.sort
-
   elsif action == "r"
-    puts "[a]dd [name] | [r]emove | [s]how"
+    puts "[a]dd [name] | [r]emove | [s]how | [u]nmade"
     input = gets.chomp.split(" ")
     recipe_action = input[0]
     name = input[1..-1].join(" ")
@@ -144,6 +156,9 @@ while (true)
         title = @recipes.titles.sort[index - 1]
         Launchy.open(@evernote_drinks[title][:url]) 
       end
+    when "u"
+      unmade = @evernote_drinks.titles.reject{ |t| @evernote_drinks[t][:made] }
+      print_recipes(unmade)
     end
 
   elsif action == "q"
@@ -156,5 +171,4 @@ end
 =begin
 TODO
 unmade drinks
-missing ingreds for unmade (& just drinks in general)
 =end
