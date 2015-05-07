@@ -68,6 +68,7 @@ while (true)
 
   if action.to_i > 0
     drink = unsynced[action.to_i - 1]
+    Launchy.open(@evernote_drinks[drink][:url])
     add_drink(drink) if drink
 
   elsif action == "m"
