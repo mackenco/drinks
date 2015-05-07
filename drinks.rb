@@ -157,7 +157,7 @@ while (true)
         Launchy.open(@evernote_drinks[title][:url]) 
       end
     when "u"
-      unmade = @evernote_drinks.titles.reject{ |t| @evernote_drinks[t][:made] }
+      unmade = @recipes.data.reject { |r| @evernote_drinks[r][:made] }
       print_recipes(unmade)
     end
 
@@ -170,5 +170,4 @@ while (true)
 end
 =begin
 TODO
-unmade drinks
 =end
