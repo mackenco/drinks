@@ -138,9 +138,9 @@ while (true)
       Readline.completion_proc = comp
       Readline.completion_append_character = ""
 
-      puts @recipes.titles
       input = Readline.readline('', true)
       @recipes = @recipes.remove(input)
+      puts @recipes.titles
     when "s"
       @recipes.titles.sort.each_with_index do |t, i|
         print "#{i + 1}.".ljust(5).light_yellow
